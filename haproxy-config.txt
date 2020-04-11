@@ -1,0 +1,28 @@
+frontend http-in
+        bind *:80
+
+        # Define hosts
+        acl host_apple hdr(host) -i apple.com
+        acl host_orange hdr(host) -i orange.com
+
+        ## figure out which one to use
+        use_backend apple_cluster if host_apple
+        use_backend orange_cluster if host_orange
+
+backend apple_cluster
+        balance leastconn
+        option httpclose
+        option forwardfor
+        cookie JSESSIONID prefix
+        server node1 10.0.0.1:8080 cookie A check
+        ##  server node1 10.0.0.2:8080 cookie A check
+        ##  server node1 10.0.0.3:8080 cookie A check
+
+
+backend orange_cluster
+        balance leastconn
+        option httpclose
+        option forwardfor
+        cookie JSESSIONID prefix
+        # server node1 10.0.0.4:8080 cookie A check
+        # server node1 10.0.0.5:8080 cookie A check
